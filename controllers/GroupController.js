@@ -1,9 +1,10 @@
 const sequelize = require('../util/database');
 const Student = require('../models/Student');
 const Group = require('../models/Group');
+const GroupMemberShip = require('../models/GroupMembership');
 const { QueryTypes } = require('sequelize');
 
-// Get groups based on group membership and email
+// Heneter alle gruppene brukeren er medlem av - Anders Olai Pedersen 225280
 exports.getUserGroups = async (req, res) => {
 
     const student = await Student.findOne({where: {email : req.query.email }});
@@ -49,6 +50,43 @@ exports.getUserGroups = async (req, res) => {
     }
 };
 
+// Henter alle gruppene - Anders Olai Pedersen 225280
+exports.getAllGroups = async (req, res) => {
+
+
+    try {
+        const userGroups = await sequelize.query(
+            "SELECT groups.StudentId AS sId, groups.groupName, groups.description, groups.location, groups.courseCode, groups.id AS gId " +
+            "FROM groups " +
+            "GROUP BY gId",
+            {
+                type: QueryTypes.SELECT
+            }
+        );
+
+        if (!userGroups) {
+            res.status(403).send({
+                error: 'No groups in db..'
+            });
+            return
+        } else {
+
+            res.status(200).send({
+                message: 'Ok! Groups fetched from db.',
+                userGroups: userGroups
+            });
+        }
+
+    }catch (e) {
+        res.status(400).send({
+            message: 'DB Query error',
+            err: e.toString()
+        });
+    }
+
+};
+
+// Henter alle gruppemedlemmene - Anders Olai Pedersen 225280
 exports.getGroupMembers = async (req, res) => {
     const group = await Group.findOne({where: {id : req.query.gid }});
 
@@ -86,7 +124,36 @@ exports.getGroupMembers = async (req, res) => {
     }
 };
 
+// Blir med i gruppe - Anders Olai Pedersen 225280
+exports.postJoinGroupRequest = async (req, res, next) => {
+    try {
+        const groupMembershipExists = GroupMemberShip.findAll({where: {StudentId: req.body.StudentId, GroupId: req.body.GroupId }});
 
+        if (groupMembershipExists.length > 0) {
+            res.status(400).send({
+                message: "Student already in group.."
+            });
+            return
+        }
+
+        const groupMembership = await GroupMemberShip.create({
+            StudentId : req.body.StudentId,
+            GroupId: req.body.GroupId
+        });
+
+        if (groupMembership) {
+            res.status(200).send({
+                message: "Student added to group."
+            })
+        }
+    }catch (e) {
+        res.status(400).send({
+            message: "Query error."
+        })
+    }
+};
+
+// Registerer gruppe - Anders Olai Pedersen 225280
 exports.postRegisterGroup = async (req, res, next) => {
     try {
         const studentId = req.body.studentId;
@@ -103,7 +170,7 @@ exports.postRegisterGroup = async (req, res, next) => {
             });
             return ;
         }
-        
+
 
         const [results, metadata] = await sequelize.query(`INSERT INTO groups(groupName, description, courseCode, location, StudentId) 
                 VALUES(:groupName, :description, :courseCode, :location, :studentId)`,

@@ -2,7 +2,7 @@ const Student = require('../models/Student');
 const sequelize = require('../util/database');
 const { QueryTypes } = require('sequelize');
 
-
+// Henter brukeren - Anders Olai Pedersen 225280
 exports.getUser = async (req, res) => {
     const student = await Student.findOne({where: {email : req.query.email }});
 

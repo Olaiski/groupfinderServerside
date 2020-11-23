@@ -5,10 +5,8 @@ const jwt = require('jsonwebtoken');
 const { registerValidation } = require('../policies/validation');
 const { loginValidation } = require('../policies/validation');
 
+// Registrere - Anders Olai Pedersen 225280
 exports.register = async (req, res) => {
-    // Bruker funksjonen i policies/validation
-    // const { error } = registerValidation(req.body);
-    // if (error) return res.status(400).send(error.details[0].message);
 
     // Sjekker om studenten er i db'en
     const emailExist = await Student.findOne({
@@ -44,7 +42,7 @@ exports.register = async (req, res) => {
 };
 
 
-// LOGIN
+// LOGIN - Anders Olai Pedersen 225280
 exports.login = async (req, res) => {
     // Validere data
     // const { error } = loginValidation(req.body);
@@ -86,15 +84,4 @@ exports.login = async (req, res) => {
             student: savedStudent
         });
     }
-
-    // TODO//: Skal vi bruke tokens på samme måte?
-    // Lager / tildeler token når man logger inn
-    // const token = await jwt.sign({
-    //         email: student.email,
-    //         id: student.id
-    //     },
-    //     'SECRETKEY', {
-    //         expiresIn: '1d'
-    //     }
-    // );
 };

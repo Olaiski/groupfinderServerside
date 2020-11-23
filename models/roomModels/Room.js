@@ -6,7 +6,8 @@ const Room = sequelize.define('Room', {
 
     id: {
         type: Sequelize.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
     },
     name: {
         type: Sequelize.STRING

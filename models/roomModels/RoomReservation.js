@@ -16,7 +16,6 @@ const RoomReservation = sequelize.define('RoomReservation', {
         type: Sequelize.STRING,
     },
 
-
 },{
     timestamps: false
 

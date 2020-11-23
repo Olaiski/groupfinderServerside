@@ -4,23 +4,25 @@ const sequelize = require('../util/database');
 const { QueryTypes } = require('sequelize');
 
 
-// TODO// Må nokk gå igjennom disse, noen endringer på DB modell fra forige prosjekt! 01/10/2020
 
-// Henter alle reservasjoner til gruppen
+// Henter alle fremtidige reservasjoner til gruppen
 // Anders Olai Pedersen - 225280
 exports.getUserReservations = async (req, res) => {
     try {
         const userReservations = await sequelize.query(
-            "SELECT groups.groupName, roomreservations.id AS RID, roomreservations.startDateTime AS start, roomreservations.endDateTime as end, groups.id AS GID, students.email, rooms.name AS RoomName " +
-            "FROM RoomReservations " +
+            "SELECT groups.groupName, roomreservations.startDateTime AS start, roomreservations.endDateTime as end, rooms.name AS roomName, rooms.location AS location, roomreservations.id AS rId " +
+            "FROM roomreservations " +
             "INNER JOIN rooms ON roomreservations.RoomId = rooms.id " +
             "INNER JOIN groups ON roomreservations.GroupId = groups.id " +
             "INNER JOIN groupmemberships ON groups.id = groupmemberships.GroupId " +
             "INNER JOIN students ON groupmemberships.StudentId = students.id " +
-            'WHERE students.email = :user',
+            "WHERE students.email = :user " +
+            "AND roomreservations.startDateTime > NOW() " +
+            "ORDER BY roomreservations.startDateTime ASC",
             {
-                replacements:{user: req.userData.email},
-                type: QueryTypes.SELECT
+                replacements:{user: req.query.email},
+                type: QueryTypes.SELECT,
+                raw: true
             }
         );
 
@@ -30,21 +32,31 @@ exports.getUserReservations = async (req, res) => {
             })
         }
 
-        // const userReservationsJSON = JSON.stringify(userReservations);
-        // res.status(200).send(userReservationsJSON);
-
+        let reservations = [];
+        for (let i in userReservations) {
+            reservations.push(
+                {
+                    rId: userReservations[i].rId,
+                    groupName: userReservations[i].groupName,
+                    date: userReservations[i].start.substr(0, 10),
+                    start: userReservations[i].start.substr(11, 14),
+                    end: userReservations[i].end.substr(11, 14),
+                    roomName: userReservations[i].roomName,
+                    location: userReservations[i].location
+                }
+            )
+        }
         res.status(200).send({
-            msg: 'Ok! Hentet bruker reservasjoner..',
-            userReservations: userReservations
+            message: 'Ok! Hentet bruker reservasjoner..',
+            userReservations: reservations
         });
 
     } catch (e) {
         res.status(400).send({
-            msg: 'Fant ingen reservasjoner..'
+            message: "Query error"
         });
     }
 };
-
 
 // Henter alle ledige rom innen for dato/tidspunkt
 // Anders Olai Pedersen - 225280
@@ -55,25 +67,30 @@ exports.getVacantRooms = async (req, res) => {
             "SELECT rooms.id, rooms.name FROM rooms " +
             "WHERE NOT EXISTS (SELECT * FROM roomreservations " +
             "WHERE roomreservations.RoomId = rooms.id " +
-            "AND roomreservations.startDateTime < :tid2 " +
-            "AND roomreservations.endDateTime > :tid1)",
+            "AND roomreservations.startDateTime < :time2 " +
+            "AND roomreservations.endDateTime > :time1)",
             {
                 replacements:{
-                    tid1: req.query.date + ' ' + req.query.start,
-                    tid2: req.query.date + ' ' + req.query.slutt
+                    time1: req.query.date + ' ' + req.query.start,
+                    time2: req.query.date + ' ' + req.query.end
                 },
                 type: QueryTypes.SELECT
             }
         );
 
+        // console.log(req.query)
+        // console.log(vacantRooms)
+
         if (!vacantRooms) {
             vacantRooms = await Rooms.findAll();
         }
 
-        console.log(req.query)
+        // const vacantRoomsJSON = JSON.stringify(vacantRooms);
 
-        const vacantRoomsJSON = JSON.stringify(vacantRooms);
-        res.status(200).send(vacantRoomsJSON);
+        res.status(200).send({
+            message: 'Hentet ledige rom',
+            vacantRooms: vacantRooms
+        });
 
     } catch (e) {
         res.status(400).send({
@@ -82,12 +99,12 @@ exports.getVacantRooms = async (req, res) => {
     }
 };
 
-// Henter alle gruppene til gruppelederen
+// Henter alle gruppene til gruppelederen, brukes til reservasjon av rom
 // Anders Olai Pedersen - 225280
 exports.groupLeaderGroupsAll = async (req, res) => {
     try {
         const groupLeaderGroups = await sequelize.query(
-            "SELECT students.id AS SID, groups.groupName, groups.description, groups.id AS GID " +
+            "SELECT students.id, groups.groupName, groups.description, groups.id " +
             "FROM groups " +
             "INNER JOIN students on groups.StudentId = students.id " +
             "WHERE students.email = :user ",
@@ -99,23 +116,46 @@ exports.groupLeaderGroupsAll = async (req, res) => {
 
         if (groupLeaderGroups.length > 0) {
             res.status(200).send({
-                msg: 'Ok, hentet gruppeleder grupper',
+                message: 'Ok, hentet gruppeleder grupper',
                 groupLeaderGroups: groupLeaderGroups
             });
         } else {
             res.status(400).send({
-                msg: 'Bruker er ikke gruppeleder i noen grupper'
+                message: 'Bruker er ikke gruppeleder i noen grupper'
             })
         }
     }catch (e) {
         res.status(400).send({
-            msg: 'DB/Query Error..'
+            message: 'DB/Query Error..'
         });
     }
 };
 
+// Reserverer rom, mangler sjekk..
+// Anders Olai Pedersen - 225280
+exports.reserveRoom = async (req, res) => {
+    try{
+        const reserveRoom = await RoomsReservation.create({
+            startDateTime: req.body.startDateTime,
+            endDateTime: req.body.endDateTime,
+            RoomId: req.body.roomId,
+            GroupId: req.body.GroupId
+        });
 
-// Avbestiller reservasjon
+        res.status(200).send({
+            message: `Ny reservation opprettet, GruppeId: ${reserveRoom.GroupId}`
+        })
+
+    }catch (e) {
+        res.status(400).send({
+            message: 'Kunne ikke reservere rom ' + e.toString()
+        });
+    }
+
+
+};
+
+// Avbestiller reservasjon (Blir ikke brukt i frontend)
 // Anders Olai Pedersen - 225280
 exports.cancelReservation = async (req,res) => {
     try {
@@ -166,7 +206,7 @@ exports.cancelReservation = async (req,res) => {
     }
 };
 
-// Oppdaterer reservasjon
+// Oppdaterer reservasjon (Blir ikke brukt i frontend)
 // Anders Olai Pedersen - 225280
 exports.updateReservation = async (req, res) => {
 
@@ -235,29 +275,3 @@ exports.updateReservation = async (req, res) => {
         });
     }
 };
-
-// Reserverer rom, mangler sjekk..
-// Anders Olai Pedersen - 225280
-exports.reserveRoom = async (req, res) => {
-    try{
-        const reserveRoom = await RoomsReservation.create({
-            startDateTime: req.body.startDateTime,
-            endDateTime: req.body.endDateTime,
-            RoomId: req.body.roomId,
-            GroupId: req.body.GroupId
-        });
-
-        res.status(200).send({
-            msg: `Ny reservation opprettet, GruppeId: ${reserveRoom.GroupId}`
-        })
-
-    }catch (e) {
-        res.status(400).send({
-            msg: 'Kunne ikke reservere rom ' + e.toString()
-        });
-    }
-
-
-};
-
-
