@@ -1,15 +1,18 @@
-const Rooms = require('../sequelizeModels/Room');
-const RoomsReservation = require('../sequelizeModels/RoomReservation');
-const sequelize = require('../util/database');
+// const Rooms = require('../sequelizeModels/Room');
+// const RoomsReservation = require('../sequelizeModels/RoomReservation');
+// const sequelize = require('../util/database');
 const { QueryTypes } = require('sequelize');
 
+const db = require('../models');
+const Room = db.Room;
+const RoomReservation = db.RoomReservation;
 
 
 // Henter alle fremtidige reservasjoner til gruppen
 // Anders Olai Pedersen - 225280
 exports.getUserReservations = async (req, res) => {
     try {
-        const userReservations = await sequelize.query(
+        const userReservations = await db.sequelize.query(
             "SELECT groups.groupName, roomreservations.startDateTime AS start, roomreservations.endDateTime as end, rooms.name AS roomName, rooms.location AS location, roomreservations.id AS rId " +
             "FROM roomreservations " +
             "INNER JOIN rooms ON roomreservations.RoomId = rooms.id " +
@@ -63,7 +66,7 @@ exports.getUserReservations = async (req, res) => {
 exports.getVacantRooms = async (req, res) => {
 
     try {
-        let vacantRooms = await sequelize.query(
+        let vacantRooms = await db.sequelize.query(
             "SELECT rooms.id, rooms.name FROM rooms " +
             "WHERE NOT EXISTS (SELECT * FROM roomreservations " +
             "WHERE roomreservations.RoomId = rooms.id " +
@@ -82,7 +85,7 @@ exports.getVacantRooms = async (req, res) => {
         // console.log(vacantRooms)
 
         if (!vacantRooms) {
-            vacantRooms = await Rooms.findAll();
+            vacantRooms = await Room.findAll();
         }
 
         // const vacantRoomsJSON = JSON.stringify(vacantRooms);
@@ -103,7 +106,7 @@ exports.getVacantRooms = async (req, res) => {
 // Anders Olai Pedersen - 225280
 exports.groupLeaderGroupsAll = async (req, res) => {
     try {
-        const groupLeaderGroups = await sequelize.query(
+        const groupLeaderGroups = await db.sequelize.query(
             "SELECT students.id, groups.groupName, groups.description, groups.id " +
             "FROM groups " +
             "INNER JOIN students on groups.StudentId = students.id " +
@@ -135,7 +138,7 @@ exports.groupLeaderGroupsAll = async (req, res) => {
 // Anders Olai Pedersen - 225280
 exports.reserveRoom = async (req, res) => {
     try{
-        const reserveRoom = await RoomsReservation.create({
+        const reserveRoom = await RoomReservation.create({
             startDateTime: req.body.startDateTime,
             endDateTime: req.body.endDateTime,
             RoomId: req.body.roomId,
@@ -159,7 +162,7 @@ exports.reserveRoom = async (req, res) => {
 // Anders Olai Pedersen - 225280
 exports.cancelReservation = async (req,res) => {
     try {
-        const GroupId = await sequelize.query(
+        const GroupId = await db.sequelize.query(
             "SELECT roomreservations.GroupId " +
             "FROM roomreservations " +
             "WHERE roomreservations.id = :RID",
@@ -174,7 +177,7 @@ exports.cancelReservation = async (req,res) => {
 
 
         const GroupIdValue = GroupId[0].GroupId;
-        const studId = await sequelize.query (
+        const studId = await db.sequelize.query (
             "SELECT groups.StudentId " +
             "FROM groups " +
             "WHERE groups.id = :GroupId",

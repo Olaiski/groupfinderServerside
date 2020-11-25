@@ -34,4 +34,11 @@ Object.keys(db).forEach(modelName => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+db.Student = require("../sequelizeModels/Student.js")(sequelize, Sequelize);
+db.Group = require("../sequelizeModels/Group.js")(sequelize, Sequelize);
+db.GroupMembership = require("../sequelizeModels/GroupMembership")(sequelize, Sequelize);
+db.Room = require("../sequelizeModels/Room.js")(sequelize, Sequelize);
+db.RoomReservation = require("../sequelizeModels/RoomReservation.js")(sequelize, Sequelize);
+db.RoomType = require("../sequelizeModels/RoomType.js")(sequelize, Sequelize);
+
 module.exports = db;

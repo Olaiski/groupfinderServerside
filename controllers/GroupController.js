@@ -1,8 +1,17 @@
-const sequelize = require('../util/database');
-const Student = require('../sequelizeModels/Student');
-const Group = require('../sequelizeModels/Group');
-const GroupMemberShip = require('../sequelizeModels/GroupMembership');
+// const sequelize = require('../util/database');
+// const sequelize = require('../models')
+// const Student = require('../sequelizeModels/Student');
+// const Group = require('../sequelizeModels/Group');
+// const GroupMemberShip = require('../sequelizeModels/GroupMembership');
+
+const db = require('../models');
+const Student = db.Student;
+const Group = db.Group;
+const GroupMembership = db.GroupMembership;
+
 const { QueryTypes } = require('sequelize');
+
+
 
 // Heneter alle gruppene brukeren er medlem av - Anders Olai Pedersen 225280
 exports.getUserGroups = async (req, res) => {
@@ -16,7 +25,7 @@ exports.getUserGroups = async (req, res) => {
         return
     }
     try {
-        const userGroups = await sequelize.query(
+        const userGroups = await db.sequelize.query(
             "SELECT students.id AS sId, groups.groupName, groups.description, groups.location, groups.courseCode, groups.id AS gId " +
             "FROM groups " +
             "INNER JOIN groupmemberships ON groupmemberships.GroupId = groups.id " +
@@ -54,7 +63,7 @@ exports.getUserGroups = async (req, res) => {
 exports.getAllGroups = async (req, res) => {
 
     try {
-        const userGroups = await sequelize.query(
+        const userGroups = await db.sequelize.query(
             "SELECT groups.StudentId AS sId, groups.groupName, groups.description, groups.location, groups.courseCode, groups.id AS gId " +
             "FROM groups " +
             "GROUP BY gId",
@@ -97,7 +106,7 @@ exports.getGroupMembers = async (req, res) => {
     }
 
     try {
-        const groupMembers = await sequelize.query(
+        const groupMembers = await db.sequelize.query(
             "SELECT students.id, students.firstname, students.lastname " +
             "FROM groups " +
             "INNER JOIN groupmemberships ON groupmemberships.GroupId = groups.id " +
@@ -126,7 +135,7 @@ exports.getGroupMembers = async (req, res) => {
 // Blir med i gruppe - Anders Olai Pedersen 225280
 exports.postJoinGroupRequest = async (req, res, next) => {
     try {
-        const groupMembershipExists = GroupMemberShip.findAll({where: {StudentId: req.body.StudentId, GroupId: req.body.GroupId }});
+        const groupMembershipExists = GroupMembership.findAll({where: {StudentId: req.body.StudentId, GroupId: req.body.GroupId }});
 
         if (groupMembershipExists.length > 0) {
             res.status(400).send({
@@ -135,7 +144,7 @@ exports.postJoinGroupRequest = async (req, res, next) => {
             return
         }
 
-        const groupMembership = await GroupMemberShip.create({
+        const groupMembership = await GroupMembership.create({
             StudentId : req.body.StudentId,
             GroupId: req.body.GroupId
         });
@@ -171,7 +180,7 @@ exports.postRegisterGroup = async (req, res, next) => {
         }
 
 
-        const [results, metadata] = await sequelize.query(`INSERT INTO groups(groupName, description, courseCode, location, StudentId) 
+        const [results, metadata] = await db.sequelize.query(`INSERT INTO groups(groupName, description, courseCode, location, StudentId) 
                 VALUES(:groupName, :description, :courseCode, :location, :studentId)`,
             {
                 replacements: {
@@ -186,7 +195,7 @@ exports.postRegisterGroup = async (req, res, next) => {
         let affectedRows = metadata;
 
         if(affectedRows > 0) {
-            const result = await sequelize.query(`INSERT INTO groupmemberships(StudentId, GroupId)
+            const result = await db.sequelize.query(`INSERT INTO groupmemberships(StudentId, GroupId)
                 VALUES(:StudentId, :groupId)`, {
                 replacements: {StudentId: `${studentId}`, groupId: `${idFromResults}`},
                 type: QueryTypes.INSERT
@@ -203,8 +212,6 @@ exports.postRegisterGroup = async (req, res, next) => {
                 })
             }
         }
-
-
 
     } catch (e) {
         console.log(e.toString());

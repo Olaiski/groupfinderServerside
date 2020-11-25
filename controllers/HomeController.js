@@ -1,6 +1,9 @@
-const Student = require('../sequelizeModels/Student');
-const sequelize = require('../util/database');
-const { QueryTypes } = require('sequelize');
+// const Student = require('../sequelizeModels/Student');
+// const sequelize = require('../util/database');
+// const { QueryTypes } = require('sequelize');
+
+const db = require('../models');
+const Student = db.Student;
 
 // Henter brukeren - Anders Olai Pedersen 225280
 exports.getUser = async (req, res) => {

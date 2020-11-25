@@ -25,7 +25,7 @@
 
 module.exports = function (sequelize, DataTypes) {
 
-    var Room = sequelize.define('RoomType', {
+    var RoomType = sequelize.define('RoomType', {
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
@@ -42,5 +42,5 @@ module.exports = function (sequelize, DataTypes) {
         timestamps: false
 
     });
-    return Room;
+    return RoomType;
 };
