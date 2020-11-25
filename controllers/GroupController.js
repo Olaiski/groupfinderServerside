@@ -53,7 +53,6 @@ exports.getUserGroups = async (req, res) => {
 // Henter alle gruppene - Anders Olai Pedersen 225280
 exports.getAllGroups = async (req, res) => {
 
-
     try {
         const userGroups = await sequelize.query(
             "SELECT groups.StudentId AS sId, groups.groupName, groups.description, groups.location, groups.courseCode, groups.id AS gId " +

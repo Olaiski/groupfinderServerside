@@ -9,6 +9,7 @@ const Group = sequelize.define('Group', {
     description: {
         type: Sequelize.STRING
     },
+    // ++
     courseCode: {
         type: Sequelize.STRING
     },

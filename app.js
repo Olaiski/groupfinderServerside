@@ -8,7 +8,7 @@ const reservationRoute = require('./routes/reservationRoutes');
 const groupRoute = require('./routes/groupRoutes');
 const homeRoute = require('./routes/homeRoutes');
 
-const PORT = 3000;
+
 
 const app = express();
 app.use(express.json());
@@ -52,6 +52,7 @@ RoomType.hasOne(Room);
 Student.belongsToMany(Group, {through: GroupMembership});
 Group.belongsTo(Student);
 
+const PORT = process.env.PORT || 3000;
 sequelize
     .sync()
     .then(() => {
