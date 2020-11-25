@@ -9,7 +9,7 @@ const groupRoute = require('./routes/groupRoutes');
 const homeRoute = require('./routes/homeRoutes');
 
 
-
+//
 const app = express();
 app.use(express.json());
 app.use(bodyParser.json()); // Handles JSON data
