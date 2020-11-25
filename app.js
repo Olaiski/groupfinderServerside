@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 // const sequelize = require('./util/database');
-const db = require("./models")
+const db = require("./models");
 const authRoute = require('./routes/authRoutes');
 const reservationRoute = require('./routes/reservationRoutes');
 const groupRoute = require('./routes/groupRoutes');
@@ -52,9 +52,12 @@ RoomType.hasOne(Room);
 Student.belongsToMany(Group, {through: GroupMembership});
 Group.belongsTo(Student);
 
+app.get('/', function (req,res) {
+    res.send(JSON.stringify({identity: 'Yolo'}))
+})
 
 const PORT = process.env.PORT || 3000;
-db.sequelize.sync({}).then(function () {
+db.sequelize.sync({foce:true}).then(function () {
     app.listen(PORT, function () {
         console.log("Listening on " + PORT)
     })
