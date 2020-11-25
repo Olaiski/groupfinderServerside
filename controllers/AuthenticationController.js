@@ -1,4 +1,4 @@
-const Student = require('../models/Student');
+const Student = require('../sequelizeModels/Student');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 

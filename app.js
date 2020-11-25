@@ -1,8 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const sequelize = require('./util/database');
-
+// const sequelize = require('./util/database');
+const db = require("./models")
 const authRoute = require('./routes/authRoutes');
 const reservationRoute = require('./routes/reservationRoutes');
 const groupRoute = require('./routes/groupRoutes');
@@ -33,13 +33,13 @@ app.use('/api/user', groupRoute);
 app.use('/api/user', homeRoute);
 
 // Import database models
-const Student = require('./models/Student');
-const Group = require('./models/Group');
-const GroupMembership = require('./models/GroupMembership');
+const Student = require('./sequelizeModels/Student');
+const Group = require('./sequelizeModels/Group');
+const GroupMembership = require('./sequelizeModels/GroupMembership');
 
-const Room = require('./models/RoomModels/Room');
-const RoomReservation = require('./models/RoomModels/RoomReservation');
-const RoomType = require('./models/RoomModels/RoomType');
+const Room = require('./sequelizeModels/Room');
+const RoomReservation = require('./sequelizeModels/RoomReservation');
+const RoomType = require('./sequelizeModels/RoomType');
 
 //----- Database relations (Sequelize) ----- Object-Relational-Mapping //
 //hasOne - adds a foreign key to the target and singular association mixins to the source.
@@ -52,14 +52,21 @@ RoomType.hasOne(Room);
 Student.belongsToMany(Group, {through: GroupMembership});
 Group.belongsTo(Student);
 
+
 const PORT = process.env.PORT || 3000;
-sequelize
-    .sync()
-    .then(() => {
-      app.listen(PORT);
-      console.log(`Server started on port ${PORT}`)
+db.sequelize.sync({}).then(function () {
+    app.listen(PORT, function () {
+        console.log("Listening on " + PORT)
     })
-    .catch(error => {
-      console.log(error)
-    });
+})
+
+// db.sequelize
+//     .sync()
+//     .then(() => {
+//       app.listen(PORT);
+//       console.log(`Server started on port ${PORT}`)
+//     })
+//     .catch(error => {
+//       console.log(error)
+//     });
 

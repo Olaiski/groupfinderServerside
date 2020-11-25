@@ -1,4 +1,4 @@
-const Student = require('../models/Student');
+const Student = require('../sequelizeModels/Student');
 const sequelize = require('../util/database');
 const { QueryTypes } = require('sequelize');
 
