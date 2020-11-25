@@ -1,23 +1,43 @@
-const Sequelize = require('sequelize');
-const sequelize = require('../util/database');
+// const Sequelize = require('sequelize');
+// const sequelize = require('../util/database');
 
 
-const Room = sequelize.define('Room', {
+// const Room = sequelize.define('Room', {
+//
+//     id: {
+//         type: Sequelize.INTEGER,
+//         primaryKey: true,
+//         autoIncrement: true
+//     },
+//     name: {
+//         type: Sequelize.STRING
+//     },
+//     location: {
+//         type: Sequelize.STRING
+//     },
+//
+// },{
+//     timestamps: false
+// });
+//
+// module.exports = Room;
 
-    id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    name: {
-        type: Sequelize.STRING
-    },
-    location: {
-        type: Sequelize.STRING
-    },
 
-},{
-    timestamps: false
-});
-
-module.exports = Room;
+module.exports = function (sequelize, DataTypes) {
+    const Room = sequelize.define('Room', {
+        id: {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true
+        },
+        name: {
+            type: DataTypes.STRING
+        },
+        location: {
+            type: DataTypes.STRING
+        },
+    },{
+        timestamps: false
+    });
+    return Room;
+};

@@ -54,10 +54,10 @@ Group.belongsTo(Student);
 
 app.get('/', function (req,res) {
     res.send(JSON.stringify({identity: 'Yolo'}))
-})
+});
 
 const PORT = process.env.PORT || 3000;
-db.sequelize.sync({foce:true}).then(function () {
+db.sequelize.sync().then(function () {
     app.listen(PORT, function () {
         console.log("Listening on " + PORT)
     })

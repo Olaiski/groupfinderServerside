@@ -1,47 +1,85 @@
-const Sequelize = require('sequelize');
-const sequelize = require('../util/database');
+// const Sequelize = require('sequelize');
+// const sequelize = require('../util/database');
 
-const Student = sequelize.define('Student', {
+// const Student = sequelize.define('Student', {
+//
+//         firstname: {
+//             type: Sequelize.STRING
+//         },
+//
+//         lastname: {
+//             type: Sequelize.STRING
+//         },
+//
+//         email: {
+//             type: Sequelize.STRING,
+//             unique: true
+//         },
+//         phonenumber: {
+//             type: Sequelize.STRING
+//         },
+//
+//         password: {
+//             type: Sequelize.STRING
+//         },
+//
+//         createdAt: {
+//             type: 'TIMESTAMP',
+//             defaultValue: Sequelize.NOW,
+//             allowNull: false
+//         },
+//
+//         updatedAt: {
+//             type: 'TIMESTAMP',
+//             defaultValue: Sequelize.NOW,
+//             allowNull: false
+//         }
+//
+//     },{
+//         timestamps: false,
+//
+//     },
+// );
+// module.exports = Student;
 
-        firstname: {
-            type: Sequelize.STRING
-        },
+module.exports = function (sequelize, DataTypes) {
 
-        lastname: {
-            type: Sequelize.STRING
-        },
+    var Student = sequelize.define('Student', {
+            firstname: {
+                type: DataTypes.STRING
+            },
 
-        email: {
-            type: Sequelize.STRING,
-            unique: true
-        },
-        phonenumber: {
-            type: Sequelize.STRING
-        },
+            lastname: {
+                type: DataTypes.STRING
+            },
 
-        password: {
-            type: Sequelize.STRING
-        },
+            email: {
+                type: DataTypes.STRING,
+                unique: true
+            },
+            phonenumber: {
+                type: DataTypes.STRING
+            },
 
-        createdAt: {
-            type: 'TIMESTAMP',
-            defaultValue: Sequelize.NOW,
-            allowNull: false
-        },
+            password: {
+                type: DataTypes.STRING
+            },
 
-        updatedAt: {
-            type: 'TIMESTAMP',
-            defaultValue: Sequelize.NOW,
-            allowNull: false
-        }
+            createdAt: {
+                type: 'TIMESTAMP',
+                defaultValue: DataTypes.NOW,
+                allowNull: false
+            },
 
-    },{
+            updatedAt: {
+                type: 'TIMESTAMP',
+                defaultValue: DataTypes.NOW,
+                allowNull: false
+            }
+
+        }, {
         timestamps: false,
 
-    },
-);
-
-
-
-
-module.exports = Student;
+    });
+    return Student;
+};
