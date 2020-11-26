@@ -1,16 +1,9 @@
-// const sequelize = require('../util/database');
-// const sequelize = require('../models')
-// const Student = require('../sequelizeModels/Student');
-// const Group = require('../sequelizeModels/Group');
-// const GroupMemberShip = require('../sequelizeModels/GroupMembership');
-
 const db = require('../models');
 const Student = db.Student;
 const Group = db.Group;
 const GroupMembership = db.GroupMembership;
 
 const { QueryTypes } = require('sequelize');
-
 
 
 // Heneter alle gruppene brukeren er medlem av - Anders Olai Pedersen 225280

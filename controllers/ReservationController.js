@@ -1,8 +1,4 @@
-// const Rooms = require('../sequelizeModels/Room');
-// const RoomsReservation = require('../sequelizeModels/RoomReservation');
-// const sequelize = require('../util/database');
 const { QueryTypes } = require('sequelize');
-
 const db = require('../models');
 const Room = db.Room;
 const RoomReservation = db.RoomReservation;

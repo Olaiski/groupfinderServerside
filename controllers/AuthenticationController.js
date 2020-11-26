@@ -4,8 +4,6 @@ const Student = db.Student;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { registerValidation } = require('../policies/validation');
-const { loginValidation } = require('../policies/validation');
 
 // Registrere - Anders Olai Pedersen 225280
 exports.register = async (req, res) => {

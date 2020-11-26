@@ -1,7 +1,3 @@
-// const Student = require('../sequelizeModels/Student');
-// const sequelize = require('../util/database');
-// const { QueryTypes } = require('sequelize');
-
 const db = require('../models');
 const Student = db.Student;
 
