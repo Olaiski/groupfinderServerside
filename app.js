@@ -65,7 +65,7 @@ Student.belongsToMany(Group, {through: GroupMembership});
 Group.belongsTo(Student);
 
 app.get('/', function (req,res) {
-    res.send(JSON.stringify({identity: 'Yolo'}))
+    res.send(JSON.stringify({identity: 'GroupFinder Server'}))
 });
 
 const PORT = process.env.PORT || 3000;
